@@ -44,15 +44,10 @@ public class UserController {
 
     //Check which API is calling more than one service..
     // get single users
-    // int retryCount = 1;
     @GetMapping("/{userId}")
     @CircuitBreaker(name ="ratingHotelBreaker", fallbackMethod ="ratingHotelFallback")
-    // @Retry(name = "ratingHotelService", fallbackMethod = "ratingHotelFallback")
-    // @RateLimiter(name = "userRateLimiter", fallbackMethod = "ratingHotelFallback")
     public ResponseEntity<User> getSingleUser(@PathVariable String userId) {
     	logger.info("Get Single User Handler: UserController");
-        //logger.info("Retry count : {}", retryCount);
-        //retryCount++;
         User user1 = userService.getUser(userId);
         return ResponseEntity.ok(user1);
     }
@@ -68,6 +63,15 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+
+     // get all users
+     @GetMapping
+     @CircuitBreaker(name = "ratingHotelBreaker1" , fallbackMethod = "ratingHotelFallback1")
+     public ResponseEntity<List<User>> getAllUser() {
+         List<User> allUsers = userService.getAllUsers();
+         return ResponseEntity.status(HttpStatus.OK).body(allUsers);
+     }
+     
     // creating fallback method for circuitBreaker..
     public ResponseEntity<List<User>> ratingHotelFallback1(Exception ex) {
         logger.info("Fallback is executed becausec service is down", ex.getMessage());
@@ -81,13 +85,7 @@ public class UserController {
         return new ResponseEntity<List<User>>(list,HttpStatus.OK);
     }
 
-    // get all users
-    @GetMapping
-    @CircuitBreaker(name = "ratingHotelBreaker1" , fallbackMethod = "ratingHotelFallback1")
-    public ResponseEntity<List<User>> getAllUser() {
-        List<User> allUsers = userService.getAllUsers();
-        return ResponseEntity.status(HttpStatus.OK).body(allUsers);
-    }
+   
     
     
 }
