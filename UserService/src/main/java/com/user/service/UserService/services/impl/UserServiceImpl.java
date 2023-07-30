@@ -17,6 +17,7 @@ import com.user.service.UserService.entities.Rating;
 import com.user.service.UserService.entities.User;
 import com.user.service.UserService.exceptions.ResourceNotFoundException;
 import com.user.service.UserService.external.services.HotelService;
+import com.user.service.UserService.external.services.RatingService;
 import com.user.service.UserService.repositories.UserRepository;
 import com.user.service.UserService.services.UserService;
 
@@ -33,6 +34,9 @@ public class UserServiceImpl implements UserService{
     //This hotel Service is injected here for using feign client...
     @Autowired
     private HotelService hotelService;
+    //This is rating service is injected here for using feign client...
+    @Autowired
+    private RatingService ratingService;
 
     private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -49,14 +53,28 @@ public class UserServiceImpl implements UserService{
     @Override
     public List<User> getAllUsers() {
     	//TODO Here also call rating and hotel service..
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        logger.info("{}",users);
+       // List<Rating> ratingList = ratingService.getRating();
+       //using feign client mapped ratings and hotel to the user...
+        users.stream().map(user->{
+        	List<Rating> ratings = ratingService.getRating(user.getUserId());
+        	ratings.stream().map(rating->{
+        		Hotel hotel = hotelService.getHotel(rating.getHotelId());
+        		rating.setHotel(hotel);
+        		return ratings;
+        	}).collect(Collectors.toList());
+        	user.setRatings(ratings);
+        	return user;
+        }).collect(Collectors.toList());
+        return users;
     }
 
     //get single user...
     @Override
     public User getUser(String userId) {
     // get user from database using userRepository...	
-       User user = userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("user .with given id is not found on server !!" + userId));  
+    User user = userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("user .with given id is not found on server !!" + userId));  
     //fetch rating of above user from RATING SERVICE...
     //calling the service using restTemplate...   
     Rating[] ratingsOfUser = restTemplate.getForObject("http://RATING-SERVICE/ratings/users/"+user.getUserId(), Rating[].class);

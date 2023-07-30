@@ -1,5 +1,7 @@
 package com.user.service.UserService.external.services;
 
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,8 +16,8 @@ import com.user.service.UserService.entities.Rating;
 public interface RatingService {
     
     //get
-	@GetMapping("/ratings/{ratingId}")
-	Rating getRating(@PathVariable String ratingId);
+	@GetMapping("/ratings/users/{userId}")
+	List<Rating> getRating(@PathVariable String userId);
 
     //post
     @PostMapping("/ratings")
