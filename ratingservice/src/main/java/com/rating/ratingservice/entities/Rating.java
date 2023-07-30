@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name="user_ratings")
+@Table(name="ratings")
 @Entity
 public class Rating {
     @Id
@@ -28,4 +28,5 @@ public class Rating {
     // private Hotel hotel;
     //  public void setId(String ratingId2) {
     //  }
+	
 }

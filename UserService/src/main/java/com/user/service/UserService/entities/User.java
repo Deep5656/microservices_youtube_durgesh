@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -23,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name="micro_users")
+@Table(name="users")
 public class User {
 
     @Id
@@ -36,7 +35,13 @@ public class User {
     @Column(name="ABOUT")
     private String about;
 
+    //@Transient will not make the table in database for this field...
     @Transient
     private List<Rating> ratings = new ArrayList<>();
+    
+    
+
+	
+    
 
 }

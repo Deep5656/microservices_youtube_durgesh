@@ -17,4 +17,5 @@ public interface UserService {
     User getUser(String userId);
 
     //TODO:delete and update
+    // void deleteUser(String userId);
 }

@@ -1,12 +1,16 @@
 server:
   port: 8081
 
+#Spring MySQL configuration..
+
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/microservices
+    url: jdbc:mysql://localhost:3306/userservice
     username: root
     password: Deep@1007
     driver-class-name: com.mysql.cj.jdbc.Driver
+    
+#JPA configuration...
 
   jpa:
     hibernate:
@@ -25,7 +29,7 @@ spring:
   # profiles:
   #   active: prod   
 
-  # eureka server configuration
+  # eureka client configuration
 
 # eureka:
 #   instance:
