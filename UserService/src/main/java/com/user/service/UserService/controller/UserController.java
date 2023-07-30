@@ -44,10 +44,7 @@ public class UserController {
     int retryCount = 1;
 
     @GetMapping("/{userId}")
-    // @CircuitBreaker(name ="ratingHotelBreaker", fallbackMethod =
-    // "ratingHotelFallback")
     @Retry(name = "ratingHotelService", fallbackMethod = "ratingHotelFallback")
-    // @RateLimiter(name = "userRateLimiter", fallbackMethod = "ratingHotelFallback")
     public ResponseEntity<User> getSingleUser(@PathVariable String userId) {
         logger.info("Retry count : {}", retryCount);
         retryCount++;
@@ -74,11 +71,5 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(allUsers);
     }
     
-    //delete a particular user..
-    // @DeleteMapping("/{userId}")
-    // public ResponseEntity<?> delUser(@PathVariable String userId){
-    // 	System.out.println(userId);
-    // 	userService.deleteUser(userId);
-    // 	return ResponseEntity.noContent().build();
-    // }
+  
 }
