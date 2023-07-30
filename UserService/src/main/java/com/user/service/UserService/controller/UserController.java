@@ -1,5 +1,6 @@
 package com.user.service.UserService.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -65,10 +66,27 @@ public class UserController {
     }
 
     // get all users
+    int retryCount1 = 1;
     @GetMapping
+    @Retry(name = "ratingHotelService1", fallbackMethod = "ratingHotelFallback1")
     public ResponseEntity<List<User>> getAllUser() {
+        logger.info("Retry count1 : {}", retryCount1);
+        retryCount1++;
         List<User> allUsers = userService.getAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(allUsers);
+    }
+
+      // creating fallback method for circuitbreaker..
+      public ResponseEntity<List<User>> ratingHotelFallback1(Exception ex) {
+        logger.info("Fallback is executed becausec service is down", ex.getMessage());
+        User user = User.builder()
+                .email("dummy1@gmail.com")
+                .name("Dummy1")
+                .about("this user is created dummy")
+                .userId("12345")
+                .build();
+                List<User> list = Arrays.asList(user);
+        return new ResponseEntity<List<User>>(list, HttpStatus.OK);
     }
     
   
