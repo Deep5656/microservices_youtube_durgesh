@@ -68,13 +68,23 @@ resilience4j:
         permittedNumberOfCallsInHalfState: 3
         slidingWindowSize: 10
         slidingWindowType: COUNT_BASED
+      ratingHotelBreaker1:
+        registerHealthIndicator: true 
+        eventConsumerBufferSize: 10 
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 6s
+        permittedNumberOfCallsInHalfState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
            
 #retry configuration
-  retry:
-    instances:
-      ratingHotelService:
-        max-attempts: 3
-        wait-duration: 5s          
+  # retry:
+  #   instances:
+  #     ratingHotelService:
+  #       max-attempts: 3
+  #       wait-duration: 5s          
 
 # #ratelimiter configuration
 #   ratelimiter:

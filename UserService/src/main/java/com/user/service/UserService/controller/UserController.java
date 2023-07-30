@@ -1,9 +1,11 @@
 package com.user.service.UserService.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
 
+import org.hibernate.annotations.Check;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,45 +42,52 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(user1);
     }
 
+    //Check which API is calling more than one service..
     // get single users
-    int retryCount = 1;
-
+    // int retryCount = 1;
     @GetMapping("/{userId}")
-    // @CircuitBreaker(name ="ratingHotelBreaker", fallbackMethod =
-    // "ratingHotelFallback")
-    @Retry(name = "ratingHotelService", fallbackMethod = "ratingHotelFallback")
+    @CircuitBreaker(name ="ratingHotelBreaker", fallbackMethod ="ratingHotelFallback")
+    // @Retry(name = "ratingHotelService", fallbackMethod = "ratingHotelFallback")
     // @RateLimiter(name = "userRateLimiter", fallbackMethod = "ratingHotelFallback")
     public ResponseEntity<User> getSingleUser(@PathVariable String userId) {
-        logger.info("Retry count : {}", retryCount);
-        retryCount++;
+    	logger.info("Get Single User Handler: UserController");
+        //logger.info("Retry count : {}", retryCount);
+        //retryCount++;
         User user1 = userService.getUser(userId);
         return ResponseEntity.ok(user1);
     }
 
-    // creating fallback method for circuitbreaker..
+    // creating fallback method for circuitBreaker..
     public ResponseEntity<User> ratingHotelFallback(String userId, Exception ex) {
         logger.info("Fallback is executed becausec service is down", ex.getMessage());
         User user = User.builder()
                 .email("dummy@gmail.com")
                 .name("Dummy")
-                .about("this user is created dummy")
+                .about("this user is created dummy because some services are down")
                 .userId("1234")
                 .build();
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+    // creating fallback method for circuitBreaker..
+    public ResponseEntity<List<User>> ratingHotelFallback1(Exception ex) {
+        logger.info("Fallback is executed becausec service is down", ex.getMessage());
+        User user = User.builder()
+                .email("dummy1@gmail.com")
+                .name("Dummy1")
+                .about("this user is created dummy because some services are down")
+                .userId("12345")
+                .build();
+                 List<User> list = Arrays.asList(user);
+        return new ResponseEntity<List<User>>(list,HttpStatus.OK);
+    }
 
     // get all users
     @GetMapping
+    @CircuitBreaker(name = "ratingHotelBreaker1" , fallbackMethod = "ratingHotelFallback1")
     public ResponseEntity<List<User>> getAllUser() {
         List<User> allUsers = userService.getAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(allUsers);
     }
     
-    //delete a particular user..
-    // @DeleteMapping("/{userId}")
-    // public ResponseEntity<?> delUser(@PathVariable String userId){
-    // 	System.out.println(userId);
-    // 	userService.deleteUser(userId);
-    // 	return ResponseEntity.noContent().build();
-    // }
+    
 }
